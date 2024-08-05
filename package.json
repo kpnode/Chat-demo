@@ -1,0 +1,31 @@
+{
+  "name": "nj_0032_socket",
+  "version": "1.0.0",
+  "description": "Socket programming implementation",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [
+    "kpnode"
+  ],
+  "author": "kpnode",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "he": "^1.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "moment": "^2.30.1",
+    "mongoose": "^8.3.1",
+    "nodemon": "^3.1.0",
+    "pm2": "^5.3.1",
+    "socket.io": "^4.7.5",
+    "views": "^1.0.2"
+  }
+}

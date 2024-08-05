@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <link rel="shortcut icon" href="./../favicon/chat.webp " />
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet">
+  </head>
+  <body>
+
+    <!-- notificaton Container -->
+    <div id="toastContainer" aria-live="polite" aria-atomic="true"
+      style="position: fixed; top: 0; right: 0; z-index: 1050; margin: 20px;"></div>
+
+     <div class="container mt-5">
+      <div class="row justify-content-center p-5">
+        <div class="col-md-6 rounded shadow-lg p-5">
+      <h2 class="text-center mb-4">Login</h2>
+          <form action="/login" method="post"
+            enctype="application/x-www-form-urlencoded" id="loginform"
+            onsubmit="return validateForm()">
+            <div class="mb-3">
+              <label for="email" class="form-label">Email address</label>
+              <input type="email" class="form-control border-secondary border-2" id="email" name="email"
+                placeholder="Enter your email">
+              <span id="emailError" class="error-message text-danger"></span>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-group border-secondary border-2">
+                <input type="password" class="form-control border-secondary border-2" id="password"
+                  placeholder="Enter your password" name="password">
+                <button class="btn btn-outline-secondary" type="button"
+                  id="togglePassword">
+                  <i class="bi bi-eye-slash"></i>
+                </button>
+              </div>
+              <span id="passError" class="error-message text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <a href="/signup" class="text-dark ms-5">Don't have an account? Sign
+              Up</a>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script>
+     document.getElementById('togglePassword').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password');
+      const icon = this.querySelector('i');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+      } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+      }
+    });
+
+        //validate email address
+        function validateEmail() {
+            const email = document.getElementById('email');
+            const emailError = document.getElementById('emailError');
+            
+            if (email.value.trim() === '') {
+                emailError.textContent = 'Email is required.'; // Fix typo here
+                return false;
+            } 
+            if (/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email.value)===false) {
+                emailError.textContent = 'Invalid email address.'; // Fix typo here
+                return false;
+            }
+            else {
+                emailError.textContent = '';
+                return true;
+            }
+        }
+
+        //validate password
+        function validatePassword() {
+            const password = document.getElementById('password');
+            const passError = document.getElementById('passError');
+            
+            if (password.value.trim() === '') {
+                passError.textContent = 'Password is required.'; // Fix typo here
+                return false;
+            } 
+            else {
+                passError.textContent = '';
+                return true;
+            }
+        }
+
+        document.getElementById('email').addEventListener('input', validateEmail);
+        document.getElementById('password').addEventListener('input', validatePassword);
+        function validateForm() {
+          if (!document.getElementById('email').value.trim()) {
+              document.getElementById('emailError').textContent = 'Email is required.';
+          }
+          if (!document.getElementById('password').value.trim()) {
+              document.getElementById('passError').textContent = 'Password is required.';
+          }
+          return validateEmail() && validatePassword(); ;
+        }
+        document.getElementById('loginform').addEventListener('submit', function(event) {
+
+        if (!validateForm()) {
+            event.preventDefault(); // Prevent form submission if validation fails
+        }
+        });
+        function showToast(message,color,duration ) {
+        var toastHTML = `
+        <div class="toast align-items-center text-dark font-weight-bold bg-${color} bg-opacity-50 border-success border-2 mt-2 role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex py-auto">
+            <h6 class="toast-body ">${message}</h6>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            </div>`;
+            $('#toastContainer').append(toastHTML);
+            var toast = $('#toastContainer').children(':last-child');
+            var bsToast = new bootstrap.Toast(toast[0]);
+            bsToast.show();
+            setTimeout(function() {
+              bsToast.hide();
+              toast.remove();
+            }, duration);
+          }
+      if('<%= notification %>'.length>0 && "<%= mcolor %>"  ){
+        var notification= "<%= notification %>";
+        var color = "<%= mcolor %>";
+        showToast(notification,color, 3000); // Show the toast for 2 seconds
+      }
+
+      </script>
+  </body>
+</html>

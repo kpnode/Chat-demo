@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Chat</title>
+    <link rel="shortcut icon" href="./../favicon/chat.webp " />
+    <!-- Bootstrap CSS CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet">
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Fix input border color */
+        #chat3 .form-control {
+            border-color: transparent !important;
+        }
+    
+        /* Fix input border color on focus */
+        #chat3 .form-control:focus {
+            border-color: transparent !important;
+            box-shadow: none !important;
+        }
+    
+        /* Fix badge position */
+        .badge-dot {
+            position: relative;
+            top: -0.75rem;
+            left: 2.9rem;
+        }
+    
+        /* Make chat content scrollable */
+        .chat-content {
+            height: 400px; /* Adjust the height as needed */
+            overflow: auto;
+        }
+        .user-content {
+          height: 480px; /* Adjust the height as needed */
+          overflow-y: auto;
+      }
+
+        /* Style the scrollbar */
+        #chatContent::-webkit-scrollbar {
+          width: 5px;
+      }
+
+      /* Track */
+      #chatContent::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 5px;
+      }
+
+      /* Handle */
+      #chatContent::-webkit-scrollbar-thumb {
+          background: linear-gradient(45deg, #ff6b6b, #5396de);
+          border-radius: 5px;
+      }
+
+      /* Handle on hover */
+      #chatContent::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(45deg, #ff6bf5, #4c98e9);
+      }
+      
+      /* Style the scrollbar */
+      .user-content::-webkit-scrollbar {
+          width: 5px;
+      }
+
+      /* Track */
+      .user-content::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 5px;
+      }
+
+      /* Handle */
+      .user-content::-webkit-scrollbar-thumb {
+          background: linear-gradient(45deg, #ff6b6b, #5396de);
+          border-radius: 5px;
+      }
+
+      /* Handle on hover */
+      .user-content::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(45deg, #ff6bf5, #4c98e9);
+      }
+        .online-status{
+          color:green
+        }
+        .offline-status{
+          color:red
+        }
+        .user-list {
+        cursor: pointer;
+        }
+              /* CSS to style the toggle button */
+      #toggleProfileBtn {
+        margin-bottom: 10px; /* Add margin to separate from other elements */
+        cursor: pointer;
+      }
+      #profileSection{
+        height: 496px;
+      }
+
+      /* CSS to hide the trash and pen icons by default */
+      .fa-trash,
+      .fa-pen {
+          display: none;
+      }
+
+      /* CSS to display the trash and pen icons when hovering over the message */
+      .message:hover .fa-trash,
+      .message:hover .fa-pen {
+          display: inline-block;
+      }
+
+    </style>
+
+  </head>
+  <body>
+
+    <!-- notificaton Container -->
+    <div id="toastContainer" aria-live="polite" aria-atomic="true"
+      style="position: fixed; top: 0; right: 0; z-index: 1050; margin: 20px;"></div>
+
+    <!-- delete model -->
+    <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      Launch demo modal
+    </button> -->
+
+    <!-- delete Modal -->
+    <div class="modal fade" id="deletechatmodal" tabindex="-1"
+      aria-labelledby="deletechatmodal" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Delete Message</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+              aria-label="Close"></button>
+          </div>
+          <form id="deletechatform">
+            <div class="modal-body">
+              <input type="hidden" name="chat" id="chatid" chat-id>
+              <p> Are you sure you want to delete this Message ?</p>
+              <p id="chatmsg" class="fw-bold"></p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary"
+                data-bs-dismiss="modal" id="closemodel">Close</button>
+              <button type="submit" class="btn btn-primary">Delete</button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- edit Modal -->
+    <div class="modal fade" id="editchatmodal" tabindex="-1"
+      aria-labelledby="editchatmodal" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editchatmodal">Edit Message</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+              aria-label="Close"></button>
+          </div>
+          <form id="editchatform">
+            <div class="modal-body">
+              <strong id class="fw-bold">Message</strong>
+              <input type="hidden" name="chatid" id="chatid" chat-id>
+              <input type="text" name="chat" id="chatmsginput"
+                class="form-control" required>
+              <span id="changemsgerror"></span>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary"
+                data-bs-dismiss="modal" id="editclosemodel">Close</button>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <section style="background-color: #CDC4F9;">
+      <div class="container py-5">
+
+        <div class="row">
+          <div class="col-md-12">
+
+            <div class="card" id="chat3" style="border-radius: 15px;">
+              <div class="card-body">
+                <div>
+                  <img id="toggleProfileBtn"
+                    src="<%=user.picture%>"
+                    alt="Toggle Profile" width="40">
+                  <strong id="userName"><%=user.name%></strong>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 col-lg-5 col-xl-4 mb-4 mb-md-0">
+                    <div class="px-3">
+
+                      <div id="profileSection" class="bg-dark bg-opacity-10 p-3"
+                        style="display: none;">
+                        <h3 class="fw-bold">User Profile</h3>
+                        <div class="mt-3">
+                          <div class="d-flex mb-3">
+                            <img id="toggleProfileBtn" class="mx-auto"
+                              src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
+                              alt="Toggle Profile" width="80">
+                          </div>
+                          <p>Name: <span id="name"><%=user.name%></span><span
+                              id="nameError"></span></p>
+                          <p>Email: <span id="email"><%=user.email%></span><span
+                              id="emailError"></span></p>
+                          <p>Password: <span
+                              id="password"><%=user.password%><span
+                                id="passError"></span></span></p>
+                        </div>
+                      </div>
+                      <div id="userlist">
+                        <div class="input-group rounded mb-3">
+                        </div>
+                        <div style="position: relative;" class="user-content">
+                          <ul class="list-group mb-0">
+                              <% for(let i=0; i<Alluser.length; i++) { %>
+                                  <li class="p-2 list-group-item border-bottom user-list d-flex justify-content-between" data-id="<%= Alluser[i]._id %>">
+                                      <div class="d-flex flex-row">
+                                          <div style="position: relative;">
+                                              <img src="<%= Alluser[i].picture %>" alt="avatar" class="d-flex align-self-center me-3" width="60">
+                                              <% if (Alluser[i].is_active) { %>
+                                                  <span class="online-status badge position-absolute top-0 end-0" id="<%= Alluser[i]._id %>_status">🟢</span>
+                                              <% } else { %>
+                                                  <span class="offline-status badge position-absolute top-0 end-0" id="<%= Alluser[i]._id %>_status">🔴</span>
+                                              <% } %>
+                                          </div>
+                                          <div class="pt-1">
+                                              <p class="fw-bold mb-0"><%= Alluser[i].name %></p>
+                                              <% if (MessageData[i] != null) { 
+                                                let lastMsg = MessageData[i].last_msg;
+                                                let maxLength = 18; 
+                                                let displayMsg = lastMsg.length > maxLength ? lastMsg.substring(0, maxLength) + "..." : lastMsg;
+                                            %>
+                                                <p class="small text-muted" id="lastmsg_<%= MessageData[i]._id %>"><%= displayMsg %></p>
+                                            <% } %>
+                                            
+                                            
+                                            
+                                          </div>
+                                        </div>
+                                        <div class="text-end " >
+                                          <%if(MessageData[i]!=null){%>
+                                            <small class="small text-muted"  id="msgtime_<%=MessageData[i]._id%>"><%= MessageData[i].formattedUpdatedAt%></small><br>
+                                          <% } %>
+                                          <% const unreadCount = unreadCounts.find(count => count.userId.toString() === Alluser[i]._id.toString()); %>
+                                          <div id="unreadDiv_<%=Alluser[i]._id%>">
+                                          <% if (unreadCount && unreadCount.count > 0) { %>
+                                              <b class="text-white mstext-end bg-danger rounded-circle py-1 px-2" id="unread_<%=Alluser[i]._id%>" style="font-size: 12px;"><%= unreadCount.count %></b>
+                                              <% } %>
+                                            </div>
+                                            </div>
+                                  </li>
+                              <% } %>
+                          </ul>
+                      </div>
+                      
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 col-lg-7 col-xl-8" id="chat-container">
+                      <div class="row">
+                        <div class="col-10">
+                          <ul class="list-unstyled">
+                            <li class="py-1 border-bottom">
+                              <a href="#"
+                                class="d-flex justify-content-between text-decoration-none">
+                                <div class="d-flex flex-row">
+                                  <div>
+                                    <img
+                                      src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
+                                      alt="avatar" id="senderimg"
+                                      class="d-flex align-self-center me-3"
+                                      width="50">
+                                    <span
+                                      class="badge mt-bg-success badge-dot"></span>
+                                  </div>
+                                  <div class="py-2">
+                                    <p class="fw-bold mb-0 " id="sendername"
+                                      style="font-size:20px;">Marie Horwitz</p>
+                                      <small id="typer"></small>
+                                  </div>
+                                </div>
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                        
+                        <div class="col-2 mt-2">
+                          <a href="/logout" class="text-info text-decoration-none"
+                            style="font-size: 25px;">
+                            <span class="text-secondary me-2"></span> <i
+                              class="fa fa-sign-out" aria-hidden="true"></i>
+                          </a>
+                        </div>
+                      </div>
+                      <div class="pt-3 pe-3 chat-content"
+                        data-mdb-perfect-scrollbar="true" id="chatContent">
+                      </div>
+
+                      <div
+                        class="text-muted d-flex justify-content-start align-items-center pe-3 pt-3 mt-2 w-100">
+                        <img src="<%=user.picture%>"  alt="avatar 3"
+                          style="width: 40px;">
+                        <form action="/savechat" method="post" id="chatform"
+                          class="w-100 d-flex"
+                          enctype="application/x-www-form-urlencoded">
+                          <input type="text" class="form-control" autocomplete="off"
+                            style="width: 100%;" id="msg" name="msg"
+                            placeholder="Type message">
+                          <button type="submit" class="btn" id="submitBtn"><i
+                              class="fas fa-paper-plane"></i></button>
+                        </form>
+                      </div>
+
+                    </div>
+                    <div class="col-md-6 col-lg-7 col-xl-8 text-center my-auto"
+                      id="banner">
+                      <div class="col-1 my-2 mx-auto">
+                        <a href="/logout"
+                          class="text-info d-flex my-auto text-decoration-none"
+                          style="font-size: 25px;"><span
+                            class="text-secondary me-2 ">Logout</span>
+                          <i class="fa fa-sign-out mt-2" aria-hidden="true"></i>
+                        </a>
+                      </div>
+                      <div class="d-flex justify-content-center  text-center">
+                        <h3 class="text-secondary">Click on any user to
+                          chat</h3>
+                      </div>
+                      <p class="text-dark"><i class="fa-solid fa-lock"></i>
+                        End-to-end encryption</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+      <script
+        src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+      <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        
+        <script>
+        //socketing
+        var socket = io('/chatapp',{
+          auth:{
+            token:"<%=user._id%>"
+        }
+        });
+
+       $(document).ready(function() {
+        let originalFieldValues = {};
+        $('#name, #email, #password,#caption').click(function() {
+          $(this).attr('contenteditable', 'true');
+        });
+
+        $('#name, #email, #password,#caption').focus(function() {
+          let fieldId = $(this).attr('id');
+          originalFieldValues[fieldId] = $(this).text();
+        });
+
+        // Save changes when pressing Enter key
+        $('#name, #email, #password,#caption').keypress(function(event) {
+          if (event.which === 13) {
+            event.preventDefault();
+            $(this).blur();
+          }
+        });
+
+      // Disable editing when clicking outside the profile fields
+      $('#name, #email, #password,#caption').blur(function() {
+        $(this).attr('contenteditable', 'false');
+        var fieldId = $(this).attr('id');
+        var fieldValue = $(this).text();
+        // Perform validation here
+        if (fieldValue.trim().length === 0) {
+          $(`#${fieldId}Error`).text('Field cannot be empty');
+          $(`#${fieldId}Error`).addClass('text-danger');
+          $(this).text(originalFieldValues[fieldId]); // Revert to original value
+          return; 
+        } else {
+          $(`#${fieldId}Error`).text(''); 
+          $(`#${fieldId}Error`).removeClass('text-danger');
+        }
+        $.ajax({
+          url: '/updateProfile',
+          method: 'POST',
+          data: { [fieldId]: fieldValue },
+          success: function(response) {
+            let data = response.data
+            $('#name').text(data.name);
+            $('#userName').text(data.name);
+            $('#email').text(data.email);
+            $('#caption').text(data.caption);
+            $('#password').text(data.password);
+            socket.emit('sortUserList');
+          },
+          error: function(xhr, status, error) {
+            // Handle error response
+          }
+        });
+
+      });
+    });
+      
+        var chatForm = document.getElementById('chatform');
+        var btn= document.getElementById('submitBtn');
+          btn.addEventListener('click', function(e) {
+            var msg = chatForm.msg.value;
+            if (msg.length<1) {
+              btn.disabled=true
+              return false;
+            }else{
+              btn.disabled=false;
+              return true;
+            }
+          });
+
+        chatForm.addEventListener('input', function(event) {
+            if(event.target.value.length<1){
+              document.getElementById('submitBtn').disabled = true;
+            }else{
+              document.getElementById('submitBtn').disabled = false;
+            }
+        });
+
+
+      socket.on('newUserSignedUp',(data)=>{
+        socket.emit('changeListInActiveUSer')
+      })
+
+      // Listen for updates to the user list from the server
+      socket.on('updatedUserList', (data) => {
+          const userdata=data.data
+          const unreadCounts=data.unreadCounts
+          const MessageData=data.MessageData
+          function truncateMessage(message, maxLength) {
+    if (message.length <= maxLength) {
+        return message;
+    }
+    let truncated = message.substring(0, maxLength);
+    let lastSpaceIndex = 18
+      truncated = truncated.substring(0, lastSpaceIndex);
+    return truncated + "...";
+}
+
+var userlistContent = `
+    <div class="input-group rounded mb-3">
+    </div>
+    <div style="position: relative;" class="user-content">
+        <ul class="list-group mb-0">
+            ${userdata.map((user, i) => {
+                let lastMsg = MessageData[i] != null ? truncateMessage(MessageData[i].last_msg, 18) : '';
+                return `
+                    <li class="p-2 list-group-item border-bottom user-list d-flex justify-content-between" data-id="${user._id}">
+                        <div class="d-flex flex-row">
+                            <div style="position:relative;">
+                                <img src="${user.picture}" alt="avatar" class="d-flex align-self-center me-3" width="60">
+                                ${user.is_active ? ` 
+                                  <span class="online-status badge position-absolute top-0 end-0" id="${user._id}_status">🟢</span>` : `
+                                  <span class="offline-status badge  position-absolute top-0 end-0" id="${user._id}_status">🔴</span>`}
+                            </div>
+                            <div class="pt-1">
+                                <p class="fw-bold mb-0">${user.name}</p>
+                                ${MessageData[i] != null ? `<p class="small text-muted" id="lastmsg_${MessageData[i]._id}">${lastMsg}</p>` : ''}
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                          ${MessageData[i] != null ? `<small class="small text-muted" id="msgtime_${MessageData[i]._id}">${MessageData[i].formattedUpdatedAt}</small><br>` : ''}
+                          <div id="unreadDiv_${user._id}">
+                            ${unreadCounts.find(count => count.userId.toString() === user._id.toString() && count.count > 0)
+                                ? `<b class="text-white bg-danger rounded-circle py-1 px-2" id="unread_${user._id}" style="font-size: 12px;">
+                                      ${unreadCounts.find(count => count.userId.toString() === user._id.toString() && count.count > 0).count > 5 ? '5+' : unreadCounts.find(count => count.userId.toString() === user._id.toString() && count.count > 0).count}
+                                  </b>`
+                                : ''
+                            }     
+                          </div>
+
+                        </div>          
+                    </li>
+                `;
+            }).join('')}
+        </ul>
+    </div>
+`;
+document.getElementById('userlist').innerHTML = userlistContent;
+
+  });
+        var sender_id="<%=user._id%>"
+        socket.on("activeuser",(data)=>{
+          $("#"+data.userid+"_status").text("🟢")
+          $("#"+data.userid+"_status").removeClass('offline-status')
+          $("#"+data.userid+"_status").addClass('online-status')  
+        })
+        socket.on("offlineuser",(data)=>{
+          $("#"+data.userid+"_status").text("🔴")
+          $("#"+data.userid+"_status").removeClass('online-status')
+          $("#"+data.userid+"_status").addClass('offline-status')
+        })
+
+       $(document).ready(() => {
+        $('#toggleProfileBtn').click(function() {
+          $("#profileSection").toggle()
+          $('#userlist').toggle(); 
+        });
+        
+         $("#chat-container").hide();
+          let receiver_id = "";
+          $(document).ready(() => {
+
+
+    // Event delegation for dynamically added .user-list elements
+    $('#userlist').on('click', '.user-list', function() {
+        receiver_id = $(this).data("id");
+        $("#chat-container").show();
+        $("#banner").hide();
+        socket.emit("switchuser", { receiver_id: receiver_id });  
+        socket.on("userdata", async (data) => {
+            $("#sendername").text(data.name);
+            $("#senderimg").attr("src", data.picture);
+        });
+        socket.emit("existchats", { sender_id: sender_id, receiver_id: receiver_id });  
+        socket.emit("ReadByUser", { sender_id: sender_id, receiver_id: receiver_id });
+    });
+});
+
+      // index.js
+              function scrollToBottom() {
+          var chatContent = document.getElementById('chatContent');
+          chatContent.scrollTop = chatContent.scrollHeight;
+        }
+
+        $('#chatform').submit(function(event) {
+        event.preventDefault();
+        var message = $("#msg").val();
+        $.ajax({
+            url: '/savechat',
+            type: 'POST',
+            data: {
+                msg: message,
+                receiver_id: receiver_id,
+              sender_id: sender_id,
+          },
+          success: function(response) {
+            if (response.success) {
+                  $("#msg").val(""); // Clear the input field after sending the message
+                  let data = response.data; // Access message from the response
+                  let html = `  <!-- Sender -->
+                  <div class="row mt-2 mx-auto sender-chat justify-content-end">
+                    <div class="col-4"></div> <!-- Empty column for spacing -->
+                    <div class="col-8 w-auto" style="max-width: 80%;">
+                        <p class="small p-2 rounded-3 mb-1 message ${data._id}_edited" style="background-color: #dcf8c6;" id="${data._id}">
+                            ${data.msg}
+                            <i class="fa-solid fa-trash text-danger btn btndlt" id="${data._id}" data-bs-toggle="modal" data-bs-target="#deletechatmodal"></i>
+                            <i class="fa-solid fa-pen text-primary btnedit btn" id="${data._id}" data-bs-toggle="modal" data-bs-target="#editchatmodal"></i>
+                        </p>
+                    </div>
+                </div>
+                        `;
+                  $('.chat-content').append(html); 
+                  scrollToBottom();
+                  socket.emit('newchat', response.data);
+                  socket.emit('unreadchat', response.data);
+                  socket.emit('sortUserList',response.data);
+              }else{
+                console.log("error");
+              }
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+              console.log('Error:', textStatus, errorThrown);
+          }
+      });
+  });
+
+  socket.on('sendchat', function(data){ 
+    // for (let i = 0; i < data.unreadCounts.length; i++) {
+    //     $(`#unread_${data.unreadCounts[i].userId.toString()}`).text(data.unreadCounts[i].count)
+    // }
+    let msgData=data.data
+    if (msgData.receiver_id==sender_id && msgData.sender_id==receiver_id) {
+            let html=`  <!-- Receiver -->
+                    <div class="row mt-2 mx-auto receiver-chat">
+                      <div class="col-8 w-auto" style=" max-width: 80%;">
+                        <p class="small p-2 rounded-3 mb-1 ${msgData._id}_edited" style="background-color: #e4e4e4;" id="${msgData._id}">${msgData.msg} <i class="fa-solid fa-trash btn" id=${msgData._id}></i>
+                          </p>
+                      </div>
+                      <div class="col-4"></div> <!-- Empty column for spacing -->
+                      </div>
+                     `
+       $('.chat-content').append(html); 
+       scrollToBottom();
+    }
+  })
+
+  socket.on("sendBackToClient", async (data) => {
+    socket.emit("sortUserListAfterSendMsg",data)
+  })
+
+  //load old chats
+  socket.on('loadOldChats', function(data) {
+    $('.chat-content').html("");
+    var chats=data.chats
+    let htmlcontent=""
+    for (let i = 0; i < chats.length; i++) {
+      if (chats[i].sender_id==sender_id) {
+        htmlcontent= htmlcontent+
+        `
+                    <!-- Sender -->
+                      <div class="row mt-2 mx-auto sender-chat justify-content-end">
+                          <div class="col-4"></div> <!-- Empty column for spacing -->
+                          <div class="col-8 w-auto" style=" max-width: 80%;">
+                            <p class="small p-2 rounded-3 mb-1 message ${chats[i]._id}_edited" style="background-color: #dcf8c6;" id="${chats[i]._id}">${chats[i].msg} <i class="fa-solid fa-trash text-danger btn btndlt" id="${chats[i]._id}" data-bs-toggle="modal" data-bs-target="#deletechatmodal"></i>
+                              <i class="fa-solid fa-pen text-primary btnedit btn" id="${chats[i]._id}" data-bs-toggle="modal" data-bs-target="#editchatmodal"></i>
+                              </p>
+                        </div>
+                        </div>       
+        `
+      }else{
+        htmlcontent= htmlcontent+
+        `
+                      <!-- Receiver -->
+                        <div class="row mt-2 mx-auto receiver-chat ">
+                        <div class="col-8 w-auto" style=" max-width: 80%;">
+                          <p class="small p-2 rounded-3 mb-1 ${chats[i]._id}_edited" style="background-color: #e4e4e4;" id="${chats[i]._id}">${chats[i].msg} <i class="fa-solid fa-trash btn" id=${chats[i]._id}></i></p>
+                        </div>
+                        <div class="col-4"></div> <!-- Empty column for spacing -->
+                      </div>`
+      }
+    }
+    $('.chat-content').append(htmlcontent);
+    scrollToBottom();
+  })
+  //delete chat
+  $(document).on('click', '.btndlt', function() {
+    var id = $(this).attr('id');
+    var chat = $(this).parent().text(); 
+    $("#chatid").attr("chat-id",id);
+    $("#chatmsg").text(chat)
+})
+  $(document).on('click', '.btnedit', function() {
+    var id = $(this).attr('id');
+    var chat = $(this).parent().text().trim();
+    $("#chatid").attr("chat-id",id);
+    $("#chatmsginput").val(chat)
+})
+
+$("#deletechatform").submit(function() {
+  event.preventDefault();
+  var id =$("#chatid").attr("chat-id")
+        $("#" + id).closest('.sender-chat').remove();
+        $("#closemodel").click();
+        socket.emit('deletechat', id); 
+        
+        // socket.emit("unreadchat", { sender_id: sender_id, receiver_id: receiver_id });
+  })
+
+    $("#editchatform").submit(function() {
+      event.preventDefault();
+      var id =$("#chatid").attr("chat-id")
+      var msg =$("#chatmsginput").val().trim();
+      if (msg.trim().length <= 0) {
+          $("#changemsgerror").text("Please enter a message ");
+          $("#changemsgerror").addClass("text-danger");
+          $("#changemsgerror").show();
+          return;
+      }
+      $("." + id+"_edited").text(msg);
+            var col8Element = $("." + id+"_edited").closest('.sender-chat').find('.col-8');
+          col8Element.html(` <p class="small p-2 rounded-3 mb-1 message ${id}_edited" style="background-color: #dcf8c6;" id="${id}">
+                            ${msg}
+                            <i class="fa-solid fa-trash text-danger btn btndlt" id="${id}" data-bs-toggle="modal" data-bs-target="#deletechatmodal"></i>
+                            <i class="fa-solid fa-pen text-primary btnedit btn" id="${id}" data-bs-toggle="modal" data-bs-target="#editchatmodal"></i>
+                        </p>`);
+            $("#editclosemodel").click();
+            socket.emit('editchat', {id:id,msg:msg});
+    })
+
+      socket.on('updateCounterinActiveUser', (data) => {
+        if(sender_id==data.data.receiver_id && receiver_id==data.data.sender_id ){
+          socket.emit("userIsOnline",data.data)
+        }
+       else{
+        if(sender_id == data.data.receiver_id){
+          for (let i = 0; i < data.unreadCounts.length; i++) { 
+                const userId = data.unreadCounts[i].userId;
+                const count = data.unreadCounts[i].count;
+                const counterElement = $("#unread_" + userId);
+                if (count == 0) {
+                  $("#unreadDiv_"+ userId).hide();
+                } else {
+                  $("#unreadDiv_"+ userId).html(`
+                  <b class="text-white bg-danger rounded-circle py-1 px-2" id="unread_${userId}" style="font-size: 12px;">${count}</b>
+                  `);
+                  $("#unreadDiv_"+ userId).show();
+                }
+          }
+        }
+      }
+      });
+   
+
+    //delete chat
+    socket.on('removechat', function(id){
+      $("#"+id).closest('.receiver-chat').remove();
+      $("#lastmsg_"+id ).text("");
+    })
+    
+    socket.on('editrecievechat', function(data){
+      $("." + data.id+"_edited").text(data.msg)
+      $("#lastmsg_"+data.id).text(data.msg);
+    })
+});  
+
+      function showToast(message,color,duration ) {
+        var toastHTML = `
+        <div class="toast align-items-center text-dark font-weight-bold bg-${color} bg-opacity-50 border-success border-2 mt-2 role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex py-auto">
+            <h6 class="toast-body ">${message}</h6>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            </div>`;
+            $('#toastContainer').append(toastHTML);
+            var toast = $('#toastContainer').children(':last-child');
+            var bsToast = new bootstrap.Toast(toast[0]);
+            bsToast.show();
+            setTimeout(function() {
+              bsToast.hide();
+              toast.remove();
+            }, duration);
+          }
+      if('<%= notification %>'.length>0 && "<%= mcolor %>"  ){
+        var notification= "<%= notification %>";
+        var color = "<%= mcolor %>";
+        showToast(notification,color, 3000); // Show the toast for 2 seconds
+      }
+
+    </script>
+    </body>
+  </html>
